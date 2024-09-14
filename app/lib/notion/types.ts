@@ -173,8 +173,8 @@ export type Notion60DayFeedback = {
         name: string;
       };
     };
-    Comments: {
-      title: {
+    "Do you wish to add any comments or specific feedback?": {
+      rich_text: {
         plain_text: string;
       }[];
     };
