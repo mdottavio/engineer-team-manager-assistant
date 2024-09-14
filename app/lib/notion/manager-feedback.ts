@@ -1,5 +1,9 @@
 import { notionPostRequest } from "./client";
-import { Notion30DayFeedback, Notion60DayFeedback } from "./types";
+import {
+  Notion30DayFeedback,
+  Notion60DayFeedback,
+  Notion90DayFeedback,
+} from "./types";
 
 const getManagerFeedbacks = async (
   dbId: string,
@@ -137,9 +141,67 @@ How would you evaluate ${
 Do you wish to add any comments or specific feedback? 
 ${
   feedback.properties["Do you wish to add any comments or specific feedback?"]
-    .rich_text[0]?.plain_text ||
-  "" ||
-  ""
+    .rich_text[0]?.plain_text || ""
+}
+
+`,
+    ),
+  ];
+  return result;
+};
+
+const generate90DaysFeedback = async (
+  customerName: string,
+  startDate: string,
+  endDate: string,
+): Promise<string[]> => {
+  let result: string[] = [];
+  const feedback30Days = await getManagerFeedbacks(
+    process.env.NOTION_90_DAY_FEEDBACK_DATABASE_ID!,
+    customerName,
+    startDate,
+    endDate,
+  );
+  result = [
+    ...result,
+    ...feedback30Days.map(
+      (feedback: Notion90DayFeedback) => `
+Manager: ${
+        feedback.properties.hiring_manager_name.rich_text[0]?.plain_text || ""
+      }
+
+Remoter: ${feedback.properties.contractor_name.rich_text[0]?.plain_text || ""}
+
+Check-in type: 90 days
+
+Feedback date: ${feedback.properties.date.formula.date.start}
+
+Manager feedback:
+- How satisfied are you with the hire you made? ${
+        feedback.properties["How satisfied are you with the hire you made?"]
+          .number
+      } from 5
+
+How would you evaluate ${
+        feedback.properties.contractor_name.rich_text[0]?.plain_text || ""
+      } on these topics?
+ - Receiving constructive feedback: ${
+   feedback.properties["Receiving constructive feedback"].select.name
+ }
+ - Participating in team discussions: ${
+   feedback.properties["Participating in team discussions"].select.name
+ }
+ - Including big picture mindset: ${
+   feedback.properties["Including big picture mindset"].select.name
+ }
+ - Building a growth plan for the future: ${
+   feedback.properties["Building a growth plan for the future"].select.name
+ }
+
+Do you wish to add any comments or specific feedback? 
+${
+  feedback.properties["Do you wish to add any comments or specific feedback?"]
+    .title[0]?.plain_text || ""
 }
 
 `,
@@ -154,38 +216,16 @@ const generateManagerFeedback = async (
   endDate: string,
 ) => {
   let result: string[] = [];
-  await generate30DaysFeedback(customerName, startDate, endDate).then(
+  // await generate30DaysFeedback(customerName, startDate, endDate).then(
+  //   (feedback) => (result = [...result, ...feedback]),
+  // );
+  // await generate60DaysFeedback(customerName, startDate, endDate).then(
+  //   (feedback) => (result = [...result, ...feedback]),
+  // );
+  await generate90DaysFeedback(customerName, startDate, endDate).then(
     (feedback) => (result = [...result, ...feedback]),
   );
-  await generate60DaysFeedback(customerName, startDate, endDate).then(
-    (feedback) => (result = [...result, ...feedback]),
-  );
-
-  // const feedback60Days = await getManagerFeedbacks(
-  //   process.env.NOTION_60_DAY_FEEDBACK_DATABASE_ID!,
-  //   customerName,
-  //   startDate,
-  //   endDate,
-  // );
-  // const feedback90Days = await getManagerFeedbacks(
-  //   process.env.NOTION_90_DAY_FEEDBACK_DATABASE_ID!,
-  //   customerName,
-  //   startDate,
-  //   endDate,
-  // );
-  // const feedback180Days = await getManagerFeedbacks(
-  //   process.env.NOTION_180_DAY_FEEDBACK_DATABASE_ID!,
-  //   customerName,
-  //   startDate,
-  //   endDate,
-  // );
-  // const feedback270Days = await getManagerFeedbacks(
-  //   process.env.NOTION_270_DAY_FEEDBACK_DATABASE_ID!,
-  //   customerName,
-  //   startDate,
-  //   endDate,
-  // );
-  return { result: result.join("\n --- \n") };
+  return { result: result.join("\n---\n") };
 };
 
 export { generateManagerFeedback };

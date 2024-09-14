@@ -122,6 +122,7 @@ export type Notion30DayFeedback = {
     };
   };
 };
+
 export type Notion60DayFeedback = {
   id: string;
   properties: {
@@ -175,6 +176,57 @@ export type Notion60DayFeedback = {
     };
     "Do you wish to add any comments or specific feedback?": {
       rich_text: {
+        plain_text: string;
+      }[];
+    };
+  };
+};
+
+export type Notion90DayFeedback = {
+  id: string;
+  properties: {
+    hiring_manager_name: {
+      rich_text: {
+        plain_text: string;
+      }[];
+    };
+    contractor_name: {
+      rich_text: {
+        plain_text: string;
+      }[];
+    };
+    date: {
+      formula: {
+        date: {
+          start: string;
+        };
+      };
+    };
+    "How satisfied are you with the hire you made?": {
+      number: number;
+    };
+    "Including big picture mindset": {
+      select: {
+        name: string;
+      };
+    };
+    "Participating in team discussions": {
+      select: {
+        name: string;
+      };
+    };
+    "Building a growth plan for the future": {
+      select: {
+        name: string;
+      };
+    };
+    "Receiving constructive feedback": {
+      select: {
+        name: string;
+      };
+    };
+    "Do you wish to add any comments or specific feedback?": {
+      title: {
         plain_text: string;
       }[];
     };
