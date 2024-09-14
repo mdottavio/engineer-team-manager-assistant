@@ -151,14 +151,14 @@ ${
 };
 
 const generate3to9MonthsFeedback = async (
-  instance: number,
+  instance: string,
   dbId: string,
   customerName: string,
   startDate: string,
   endDate: string,
 ): Promise<string[]> => {
   let result: string[] = [];
-  const feedback30Days = await getManagerFeedbacks(
+  const feedback = await getManagerFeedbacks(
     dbId,
     customerName,
     startDate,
@@ -166,7 +166,7 @@ const generate3to9MonthsFeedback = async (
   );
   result = [
     ...result,
-    ...feedback30Days.map(
+    ...feedback.map(
       (feedback: Notion90to270DayFeedback) => `
 Manager: ${
         feedback.properties.hiring_manager_name.rich_text[0]?.plain_text || ""
@@ -237,22 +237,29 @@ const generateManagerFeedback = async (
     (feedback) => (result = [...result, ...feedback]),
   );
   await generate3to9MonthsFeedback(
-    90,
+    "90",
     process.env.NOTION_90_DAY_FEEDBACK_DATABASE_ID!,
     customerName,
     startDate,
     endDate,
   ).then((feedback) => (result = [...result, ...feedback]));
   await generate3to9MonthsFeedback(
-    180,
+    "180",
     process.env.NOTION_180_DAY_FEEDBACK_DATABASE_ID!,
     customerName,
     startDate,
     endDate,
   ).then((feedback) => (result = [...result, ...feedback]));
   await generate3to9MonthsFeedback(
-    270,
+    "270",
     process.env.NOTION_270_DAY_FEEDBACK_DATABASE_ID!,
+    customerName,
+    startDate,
+    endDate,
+  ).then((feedback) => (result = [...result, ...feedback]));
+  await generate3to9MonthsFeedback(
+    "quick check-ins",
+    process.env.NOTION_QUICK_CHECKINS_DATABASE_ID!,
     customerName,
     startDate,
     endDate,
