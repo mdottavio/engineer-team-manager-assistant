@@ -8,7 +8,7 @@ type Tag = {
   name: string;
 };
 
-const getCustomers = async (customerId: number) => {
+const getCustomer = async (customerId: number) => {
   const response = await fetch(
     `${REMOTELY_API_URL}/admin/backoffice/customers/${customerId}`,
     {
@@ -30,10 +30,10 @@ const getTagDetails = async (tagId: string): Promise<Tag> => {
   return result.status === 200 ? result.result : Promise.reject();
 };
 
-const searchCustomersDetails = async (customerId: number) => {
-  const customer = await getCustomers(customerId);
+const generateCustomersDetails = async (customerId: number) => {
+  const customer = await getCustomer(customerId);
   if (!customer) {
-    return "Customer was not found";
+    return { result: "Customer was not found", customer: null };
   }
   const industryPromise = customer.sectors.map((tagId: string) =>
     getTagDetails(tagId),
@@ -65,7 +65,7 @@ Tech Stack: ${techStack.join(", ")}
 
 Description: ${customer.description}`;
 
-  return result;
+  return { result, customer };
 };
 
-export { getCustomers, searchCustomersDetails };
+export { getCustomer, generateCustomersDetails };

@@ -1,41 +1,44 @@
-import { getRemotersCheckins } from "@/app/lib/notion";
-import { searchCustomersDetails } from "@/app/lib/remotely";
+import { generateRemotersCheckins } from "@/app/lib/notion/checkins";
+import { generateManagerFeedback } from "@/app/lib/notion/manager-feedback";
+import { generateCustomersDetails, getCustomer } from "@/app/lib/remotely";
 
-async function getCustomerDetails(customerId: number) {
-  try {
-    const details = await searchCustomersDetails(customerId);
-    return details;
-  } catch (error) {
-    throw new Error(
-      `Failed to get customer details: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`,
-    );
-  }
-}
-
-async function getFeedback(
+export async function generateReport(
   customerId: number,
   startDate: string,
   endDate: string,
 ) {
-  const customerDetails = await getCustomerDetails(customerId);
-  const checkins = await getRemotersCheckins(customerId, startDate, endDate);
+  const { result: customerDetails, customer } = await generateCustomersDetails(
+    customerId,
+  );
+
+  const { result: checkins } = await generateRemotersCheckins(
+    customerId,
+    startDate,
+    endDate,
+  );
+
+  const { result: managerFeedback } = await generateManagerFeedback(
+    customer.company_name,
+    startDate,
+    endDate,
+  );
 
   const result = `
 ${customerDetails}
 
 ${checkins}
+
+${managerFeedback}
 `;
-  return result;
+  return { result };
 }
 
 export async function runFunction(name: string, args: any) {
   switch (name) {
     case "getCustomerDetails":
-      return await getCustomerDetails(args["customerId"]);
+      return await getCustomer(args["customerId"]);
     case "getFeedback":
-      return await getFeedback(
+      return await generateReport(
         args["customerId"],
         args["startDate"],
         args["endDate"],

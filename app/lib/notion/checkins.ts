@@ -1,15 +1,9 @@
+import { notionPostRequest } from "./client";
 import {
   NormalizedCheckin,
   NotionAsyncCheckin,
   NotionSyncCheckin,
 } from "./types";
-
-const headers = new Headers();
-headers.append("authorization", `Bearer ${process.env.NOTION_SECRET}`);
-headers.append("Notion-Version", "2022-06-28");
-headers.append("content-type", "application/json");
-
-const NOTION_API_URL = "https://api.notion.com/v1";
 
 const parseAsyncCheckin = (
   checkin: NotionAsyncCheckin,
@@ -37,50 +31,47 @@ const parseSyncCheckin = (checkin: NotionSyncCheckin): NormalizedCheckin => {
   };
 };
 
-const getSyncCheckins = async (
+const getCheckins = async (
   dbId: string,
   customerId: number,
   startDate: string,
   endDate: string,
 ) => {
-  const { results } = await fetch(`${NOTION_API_URL}/databases/${dbId}/query`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      filter: {
-        and: [
-          {
-            property: "customer id",
-            number: {
-              equals: parseInt(`${customerId}`),
-            },
+  const body = {
+    filter: {
+      and: [
+        {
+          property: "customer id",
+          number: {
+            equals: parseInt(`${customerId}`),
           },
-          {
-            property: "date",
-            date: {
-              on_or_after: startDate,
-            },
+        },
+        {
+          property: "date",
+          date: {
+            on_or_after: startDate,
           },
-          {
-            property: "date",
-            date: {
-              on_or_before: endDate,
-            },
+        },
+        {
+          property: "date",
+          date: {
+            on_or_before: endDate,
           },
-        ],
-      },
-    }),
-  }).then((response) => response.json());
+        },
+      ],
+    },
+  };
+  const { results } = await notionPostRequest(`/databases/${dbId}/query`, body);
   return results;
 };
 
-const getRemotersCheckins = async (
+const generateRemotersCheckins = async (
   customerId: number,
   startDate: string,
   endDate: string,
 ) => {
   const checkins = [];
-  const asyncCheckins = await getSyncCheckins(
+  const asyncCheckins = await getCheckins(
     process.env.NOTION_ASYNC_CHECKINS_DATABASE_ID!,
     customerId,
     startDate,
@@ -89,7 +80,7 @@ const getRemotersCheckins = async (
   checkins.push(
     ...asyncCheckins.map((checkin: any) => parseAsyncCheckin(checkin)),
   );
-  const syncCheckins = await getSyncCheckins(
+  const syncCheckins = await getCheckins(
     process.env.NOTION_SYNC_CHECKINS_DATABASE_ID!,
     customerId,
     startDate,
@@ -124,7 +115,7 @@ ${checkin.quote ? `Quote: "${checkin.quote}"` : ""}
   )
   .join("\n---\n")}
 `;
-  return result;
+  return { result };
 };
 
-export { getRemotersCheckins };
+export { generateRemotersCheckins };
