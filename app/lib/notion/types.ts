@@ -182,7 +182,7 @@ export type Notion60DayFeedback = {
   };
 };
 
-export type Notion90DayFeedback = {
+export type Notion90to270DayFeedback = {
   id: string;
   properties: {
     hiring_manager_name: {
@@ -226,7 +226,10 @@ export type Notion90DayFeedback = {
       };
     };
     "Do you wish to add any comments or specific feedback?": {
-      title: {
+      title?: {
+        plain_text: string;
+      }[];
+      rich_text?: {
         plain_text: string;
       }[];
     };

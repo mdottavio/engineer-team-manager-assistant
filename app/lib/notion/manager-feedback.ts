@@ -2,7 +2,7 @@ import { notionPostRequest } from "./client";
 import {
   Notion30DayFeedback,
   Notion60DayFeedback,
-  Notion90DayFeedback,
+  Notion90to270DayFeedback,
 } from "./types";
 
 const getManagerFeedbacks = async (
@@ -150,14 +150,16 @@ ${
   return result;
 };
 
-const generate90DaysFeedback = async (
+const generate3to9MonthsFeedback = async (
+  instance: number,
+  dbId: string,
   customerName: string,
   startDate: string,
   endDate: string,
 ): Promise<string[]> => {
   let result: string[] = [];
   const feedback30Days = await getManagerFeedbacks(
-    process.env.NOTION_90_DAY_FEEDBACK_DATABASE_ID!,
+    dbId,
     customerName,
     startDate,
     endDate,
@@ -165,14 +167,14 @@ const generate90DaysFeedback = async (
   result = [
     ...result,
     ...feedback30Days.map(
-      (feedback: Notion90DayFeedback) => `
+      (feedback: Notion90to270DayFeedback) => `
 Manager: ${
         feedback.properties.hiring_manager_name.rich_text[0]?.plain_text || ""
       }
 
 Remoter: ${feedback.properties.contractor_name.rich_text[0]?.plain_text || ""}
 
-Check-in type: 90 days
+Check-in type: ${instance} days
 
 Feedback date: ${feedback.properties.date.formula.date.start}
 
@@ -201,7 +203,19 @@ How would you evaluate ${
 Do you wish to add any comments or specific feedback? 
 ${
   feedback.properties["Do you wish to add any comments or specific feedback?"]
-    .title[0]?.plain_text || ""
+    .title
+    ? feedback.properties[
+        "Do you wish to add any comments or specific feedback?"
+      ].title[0]?.plain_text
+    : ""
+}
+${
+  feedback.properties["Do you wish to add any comments or specific feedback?"]
+    .rich_text
+    ? feedback.properties[
+        "Do you wish to add any comments or specific feedback?"
+      ].rich_text[0]?.plain_text
+    : ""
 }
 
 `,
@@ -216,15 +230,33 @@ const generateManagerFeedback = async (
   endDate: string,
 ) => {
   let result: string[] = [];
-  // await generate30DaysFeedback(customerName, startDate, endDate).then(
-  //   (feedback) => (result = [...result, ...feedback]),
-  // );
-  // await generate60DaysFeedback(customerName, startDate, endDate).then(
-  //   (feedback) => (result = [...result, ...feedback]),
-  // );
-  await generate90DaysFeedback(customerName, startDate, endDate).then(
+  await generate30DaysFeedback(customerName, startDate, endDate).then(
     (feedback) => (result = [...result, ...feedback]),
   );
+  await generate60DaysFeedback(customerName, startDate, endDate).then(
+    (feedback) => (result = [...result, ...feedback]),
+  );
+  await generate3to9MonthsFeedback(
+    90,
+    process.env.NOTION_90_DAY_FEEDBACK_DATABASE_ID!,
+    customerName,
+    startDate,
+    endDate,
+  ).then((feedback) => (result = [...result, ...feedback]));
+  await generate3to9MonthsFeedback(
+    180,
+    process.env.NOTION_180_DAY_FEEDBACK_DATABASE_ID!,
+    customerName,
+    startDate,
+    endDate,
+  ).then((feedback) => (result = [...result, ...feedback]));
+  await generate3to9MonthsFeedback(
+    270,
+    process.env.NOTION_270_DAY_FEEDBACK_DATABASE_ID!,
+    customerName,
+    startDate,
+    endDate,
+  ).then((feedback) => (result = [...result, ...feedback]));
   return { result: result.join("\n---\n") };
 };
 
