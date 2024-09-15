@@ -235,3 +235,29 @@ export type Notion90to270DayFeedback = {
     };
   };
 };
+
+export type NotionNote = {
+  id: string;
+  properties: {
+    customer: {
+      title: {
+        plain_text: string;
+      }[];
+    };
+    note: {
+      rich_text: {
+        plain_text: string;
+      }[];
+    };
+    date: {
+      date: {
+        start: string;
+      };
+    };
+    tone: {
+      select: {
+        name: string;
+      };
+    };
+  };
+};

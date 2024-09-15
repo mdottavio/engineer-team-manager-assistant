@@ -20,11 +20,10 @@ export async function POST(req: Request) {
   });
 
   const now = new Date().toString();
-  const additional_instructions = `The user's customerId is ${customerId}, use it to obtain information about the team they are referring to.
-Please address the user as ${name}. ${userRole}
-Call 'getFeedback' to gain context about the startup's engineer team.
-Catt 'getCustomerDetails' to gain context about the startup such us location, tech stack, etc.
-The user's time is ${now}, use it as reference.`;
+  const additional_instructions = `The user's customerId is ${customerId} (numeric), use it to obtain information about the team and company they are referring to.
+The user's time is ${now}, use it as reference.
+${name ? `Please address the user as ${name}. ${userRole}` : ""}
+`;
   console.log(additional_instructions);
   const run = await openai.beta.threads.runs.create(thread.id, {
     model: "gpt-4-turbo",
