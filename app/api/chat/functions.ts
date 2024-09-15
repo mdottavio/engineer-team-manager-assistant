@@ -1,12 +1,24 @@
 import { generateRemotersCheckins } from "@/app/lib/notion/checkins";
 import { generateManagerFeedback } from "@/app/lib/notion/manager-feedback";
-import { generateCustomersDetails, getCustomer } from "@/app/lib/remotely";
+import { generateCustomersDetails } from "@/app/lib/remotely";
 
-export async function generateReport(
+export async function generateCustomerReport(customerId: number) {
+  if (!customerId) {
+    return "No customer id provided";
+  }
+  const { result: customerDetails } = await generateCustomersDetails(
+    customerId,
+  );
+  return customerDetails;
+}
+export async function generateCheckinsReport(
   customerId: number,
   startDate: string,
   endDate: string,
 ) {
+  if (!customerId) {
+    return "No customer id provided";
+  }
   const { result: customerDetails, customer } = await generateCustomersDetails(
     customerId,
   );
@@ -29,16 +41,20 @@ ${customerDetails}
 ${checkins}
 
 ${managerFeedback}
+
+
+
 `;
   return { result };
 }
 
 export async function runFunction(name: string, args: any) {
+  console.log(`Running function ${name} with args: ${JSON.stringify(args)}`);
   switch (name) {
     case "getCustomerDetails":
-      return await getCustomer(args["customerId"]);
+      return await generateCustomerReport(args["customerId"]);
     case "getFeedback":
-      return await generateReport(
+      return await generateCheckinsReport(
         args["customerId"],
         args["startDate"],
         args["endDate"],

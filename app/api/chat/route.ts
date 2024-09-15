@@ -9,8 +9,8 @@ const openai = new OpenAI({
 export const runtime = "edge";
 
 export async function POST(req: Request) {
-  const { messages, user, customerId } = await req.json();
-  const userRole = user?.role ? `Their role is ${user?.role}` : "";
+  const { messages, name, role, customerId } = await req.json();
+  const userRole = role ? `Who is an ${role} at the startup.` : "";
 
   const thread = await openai.beta.threads.create();
 
@@ -19,15 +19,17 @@ export async function POST(req: Request) {
     content: messages[messages.length - 1].content,
   });
 
+  const now = new Date().toString();
+  const additional_instructions = `The user's customerId is ${customerId}, use it to obtain information about the team they are referring to.
+Please address the user as ${name}. ${userRole}
+Call 'getFeedback' to gain context about the startup's engineer team.
+Catt 'getCustomerDetails' to gain context about the startup such us location, tech stack, etc.
+The user's time is ${now}, use it as reference.`;
+  console.log(additional_instructions);
   const run = await openai.beta.threads.runs.create(thread.id, {
     model: "gpt-4-turbo",
     assistant_id: process.env.OPENAI_ASSISTANT_ID!,
-    additional_instructions: `The internalCustomerId for this conversation is ${customerId}. 
-    Please address the user as ${user?.name}. ${userRole}. 
-    Call 'getFeedback' to gain context about the startup the engineer team is from 
-    Catt 'getCustomerDetails' to gain context about the startup such us location, tech stack, etc.
-    Before providing any information, call 'getCustomerDetails' to gain context about the startup the engineer team is from.
-    `,
+    additional_instructions,
     // stream: true,
   });
 

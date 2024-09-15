@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useChat } from "ai/react";
 import clsx from "clsx";
-import { VercelIcon, GithubIcon, LoadingCircle, SendIcon } from "./icons";
+import { LoadingCircle, SendIcon } from "./icons";
 import { Bot, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -13,14 +13,16 @@ import { toast } from "sonner";
 
 const examples = [
   "Can you help me understand how my team is performed in the last 30 days?",
-  "How did my team performed from 04-01-2024 to 09-15-2024?",
-  "How many check-ins did the remotely team run with my team members?",
-  "Can you help me understand how my team perfomed? take the start date 04-01-2024 and en date 09-15-2024",
+  "How did my team performed from April 1st to September 15th 2024?",
+  "How many check-ins have you run with my team members during the last 30 days?",
+  "Can you help me understand how my team performed? take the start date 04-01-2024 and en date 09-15-2024",
 ];
 
 export default function Chat() {
   const searchParams = useSearchParams();
   const customerId = searchParams.get("customerId");
+  const name = searchParams.get("name");
+  const role = searchParams.get("role");
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -36,6 +38,8 @@ export default function Chat() {
     },
     body: {
       customerId,
+      name,
+      role,
     },
   });
 
@@ -43,22 +47,7 @@ export default function Chat() {
 
   return (
     <main className="flex flex-col items-center justify-between pb-40">
-      <div className="absolute top-5 hidden w-full justify-between px-5 sm:flex">
-        <a
-          href="/deploy"
-          target="_blank"
-          className="rounded-lg p-2 transition-colors duration-200 hover:bg-stone-100 sm:bottom-auto"
-        >
-          <VercelIcon />
-        </a>
-        <a
-          href="/github"
-          target="_blank"
-          className="rounded-lg p-2 transition-colors duration-200 hover:bg-stone-100 sm:bottom-auto"
-        >
-          <GithubIcon />
-        </a>
-      </div>
+      <div className="absolute top-5 hidden w-full justify-between px-5 sm:flex"></div>
       {messages.length > 0 ? (
         messages.map((message, i) => (
           <div
@@ -99,47 +88,8 @@ export default function Chat() {
       ) : (
         <div className="border-gray-200sm:mx-0 mx-5 mt-20 max-w-screen-md rounded-md border sm:w-full">
           <div className="flex flex-col space-y-4 p-7 sm:p-10">
-            <h1 className="text-lg font-semibold text-black">
-              Welcome to ChatHN!
-            </h1>
             <p className="text-gray-500">
-              This is an{" "}
-              <a
-                href="https://github.com/steven-tey/chathn"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium underline underline-offset-4 transition-colors hover:text-black"
-              >
-                open-source
-              </a>{" "}
-              AI chatbot that uses{" "}
-              <a
-                href="https://platform.openai.com/docs/guides/gpt/function-calling"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium underline underline-offset-4 transition-colors hover:text-black"
-              >
-                OpenAI Functions
-              </a>{" "}
-              and{" "}
-              <a
-                href="https://sdk.vercel.ai/docs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium underline underline-offset-4 transition-colors hover:text-black"
-              >
-                Vercel AI SDK
-              </a>{" "}
-              to interact with the{" "}
-              <a
-                href="https://github.com/HackerNews/API"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium underline underline-offset-4 transition-colors hover:text-black"
-              >
-                Hacker News API
-              </a>{" "}
-              with natural language.
+              Here are some examples of questions you can ask:
             </p>
           </div>
           <div className="flex flex-col space-y-4 border-t border-gray-200 bg-gray-50 p-7 sm:p-10">
