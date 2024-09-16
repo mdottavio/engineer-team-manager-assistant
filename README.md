@@ -24,11 +24,17 @@ NEXTAUTH_SECRET=
 ```
 
 `OPENAI_API_KEY` can be found in the OpenAI dashboard.
+
 `OPENAI_ASSISTANT_ID` it's the id of the assistant you want to use.
+
 `REMOTELY_API_KEY` Notions' app secret, app should have access to the following databases
+
 `NOTION_ASYNC_CHECKINS_DATABASE_ID` Async checkins database id
+
 `NOTION_SYNC_CHECKINS_DATABASE_ID` Sync checkins database id
+
 `NOTION_30_DAY_FEEDBACK_DATABASE_ID`, `NOTION_60_DAY_FEEDBACK_DATABASE_ID`, `NOTION_90_DAY_FEEDBACK_DATABASE_ID`, `NOTION_180_DAY_FEEDBACK_DATABASE_ID`, `NOTION_270_DAY_FEEDBACK_DATABASE_ID`, `NOTION_QUICK_CHECKINS_DATABASE_ID`, `NOTION_CUSTOMER_NOTES_DATABASE_ID`, `NOTION_CUSTOMER_NOTES_DATABASE_ID` Feedback and notes databases ids.
+
 `NEXTAUTH_URL` and `NEXTAUTH_SECRET` are used by next auth to handle authentication.
 
 ## Local Development
@@ -38,5 +44,4 @@ npm i
 npm run dev
 ```
 
-_Based on_
-https://github.com/steven-tey/chathn/
+_Based on_ https://github.com/steven-tey/chathn/
