@@ -44,7 +44,7 @@ interface LogoutButtonProps {
 
 export const LogoutButton: React.FC<LogoutButtonProps> = ({ onClick }) => {
   return (
-    <button className="logout-button" onClick={onClick}>
+    <button className="logout-button" onClick={onClick} aria-label="Logout">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
