@@ -261,3 +261,30 @@ export type NotionNote = {
     };
   };
 };
+
+export type NotionUser = {
+  id: string;
+  properties: {
+    email: {
+      email: string;
+    };
+    name: {
+      title: {
+        plain_text: string;
+      }[];
+    };
+    role: {
+      rich_text: {
+        plain_text: string;
+      }[];
+    };
+    customerId: {
+      number: number;
+    };
+    password: {
+      rich_text: {
+        plain_text: string;
+      }[];
+    };
+  };
+};
