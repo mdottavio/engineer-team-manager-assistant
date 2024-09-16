@@ -38,5 +38,5 @@ npm i
 npm run dev
 ```
 
-_Based on _
+_Based on_
 https://github.com/steven-tey/chathn/
