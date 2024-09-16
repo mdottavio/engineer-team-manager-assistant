@@ -18,7 +18,6 @@ export async function getUserByEmail(email: string): Promise<User | null> {
       },
     },
   );
-  console.log(response);
   if (response.results && response.results.length > 0) {
     const user: NotionUser = response.results[0];
     return {

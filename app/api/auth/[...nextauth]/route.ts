@@ -5,13 +5,15 @@ import { getUserByEmail } from "@/app/lib/notion/users";
 
 // Add this type declaration
 declare module "next-auth" {
+  // eslint-disable-next-line
   interface User extends DefaultUser {
-    role: string;
-    customerId: number;
-    email: string;
+    role?: string;
+    customerId?: number;
+    email?: string;
     name: string;
     password?: string;
   }
+  // eslint-disable-next-line
   interface Session {
     user: {
       role?: string;
