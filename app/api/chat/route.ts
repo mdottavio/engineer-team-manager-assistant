@@ -34,6 +34,27 @@ ${name ? `Please address the user as ${name}. ${userRole}` : ""}
 
   const stream = new ReadableStream({
     async start(controller) {
+      const encoder = new TextEncoder();
+
+      // Get initial response from assistant
+      const initialResponse = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a helpful assistant. Provide a brief, one-sentence acknowledgment of the user's question and indicate that you'll be searching for information.",
+          },
+          { role: "user", content: messages[messages.length - 1].content },
+        ],
+        max_tokens: 50,
+      });
+
+      const initialMessage =
+        initialResponse.choices[0].message.content ||
+        "Let me search some data to answer your question...";
+      controller.enqueue(encoder.encode(initialMessage));
+
       async function waitForCompletion() {
         let runStatus = await openai.beta.threads.runs.retrieve(
           thread.id,
@@ -75,8 +96,8 @@ ${name ? `Please address the user as ${name}. ${userRole}` : ""}
 
       await waitForCompletion();
 
-      const messages = await openai.beta.threads.messages.list(thread.id);
-      const assistantMessage = messages.data.find(
+      const messagesResult = await openai.beta.threads.messages.list(thread.id);
+      const assistantMessage = messagesResult.data.find(
         (message) => message.role === "assistant",
       );
 
